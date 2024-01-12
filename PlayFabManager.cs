@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using PlayFab;
 using PlayFab.ClientModels;
 using TMPro;
@@ -9,6 +10,9 @@ public class PlayFabManager : MonoBehaviour
 {
     
     private int scoreToSubmit;
+
+    [SerializeField]
+    private Slider leaderboardSlider;
     
     [SerializeField]
     private List<PlayerLeaderboardEntry> leaderboardEntries;
@@ -32,7 +36,7 @@ public class PlayFabManager : MonoBehaviour
     {
         var request = new LoginWithCustomIDRequest
         {
-            CustomId = SystemInfo.deviceUniqueIdentifier,
+            CustomId = System.Guid.NewGuid().ToString(),
             CreateAccount = true
         };
 
@@ -105,7 +109,7 @@ public class PlayFabManager : MonoBehaviour
                 new StatisticUpdate
                 {
                     StatisticName = "Leaderboard",
-                    Value = 10
+                    Value = gameManager.GetComponent<GameManager>().PlayerScore
                 }
             }
 
@@ -136,8 +140,15 @@ public class PlayFabManager : MonoBehaviour
 
     IEnumerator WaitThenGetLeaderBoard()
     {
+        leaderboardSlider = GameObject.Find("Leaderboard Slider").GetComponent<Slider>();
+
         Debug.Log("Waiting");
-        yield return new WaitForSeconds(5f);
+        for(int i = 0; i < 100; i++)
+        {
+            yield return new WaitForSeconds(5f/100);
+            leaderboardSlider.value += 1f / 100;
+        }
+        
         GetLeaderboardStatistics();
     }
 
